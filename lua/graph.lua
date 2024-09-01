@@ -40,6 +40,11 @@ piste_type = {
 ["connection"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
 }
 
+piste_backward = {
+  ["downhill"] =        "false",
+  ["connection"] =      "true",
+}
+
 aerialway = {
 ["gondola"] =        {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
 ["cable_car"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
@@ -47,6 +52,15 @@ aerialway = {
 ["magic_carpet"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
 ["platter"] =        {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
 ["drag_lift"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+}
+
+aerialway_backward = {
+  ["gondola"] =        "true",
+  ["cable_car"] =      "true",
+  ["chair_lift"] =     "false",
+  ["magic_carpet"] =   "false",
+  ["platter"] =        "false",
+  ["drag_lift"] =      "false",
 }
 
 road_class = {
@@ -89,6 +103,20 @@ default_speed = {
 [5] = 40,
 [6] = 35,
 [7] = 25
+}
+
+default_piste_speed = {
+  ["downhill"] = 30,
+  ["connection"] = 15,
+}
+
+default_aerialway_speed = {
+  ["gondola"] =       10,
+  ["cable_car"] =      8,
+  ["chair_lift"] =     8,
+  ["magic_carpet"] =   3,
+  ["platter"] =        4,
+  ["drag_lift"] =      4,
 }
 
 access = {
@@ -522,6 +550,10 @@ wheelchair_node = {
 ["assisted"] = 256,
 ["permit"] = 256,
 ["residents"] = 256
+}
+
+aerialway_node = {
+  ["station"] = 2,
 }
 
 moped_node = {
@@ -1461,6 +1493,16 @@ function filter_tags_generic(kv)
     kv["taxi_backward"] = "true"
   end
 
+  --check for ski pistes overrides
+  if piste then
+    kv["pedestrian_backward"] = piste_backward[piste]
+  end
+
+  --check for ski lifts overrides
+  if aerialway then
+    kv["pedestrian_backward"] = aerialway_backward[aerialway]
+  end
+
   --if none of the modes were set we are done looking at this
   if kv["auto_forward"] == "false" and kv["truck_forward"] == "false" and kv["bus_forward"] == "false" and
      kv["bike_forward"] == "false" and kv["emergency_forward"] == "false" and kv["moped_forward"] == "false" and
@@ -1495,6 +1537,16 @@ function filter_tags_generic(kv)
   kv["road_class"] = rc
 
   kv["default_speed"] = default_speed[kv["road_class"]]
+  
+  --set default speed for ski pistes
+  if piste then
+    kv["default_speed"] = default_piste_speed[piste]
+  end
+
+  --set default speed for aerialway
+  if aerialway then
+    kv["default_speed"] = default_aerialway_speed[aerialway]
+  end
 
   --lower the default speed for driveways
   if kv["service"] == "driveway" then
@@ -1550,7 +1602,9 @@ function filter_tags_generic(kv)
   end
 
   if use == nil and kv["service"] then
-    use = 40 --other
+    use = 40 
+  elseif piste or aerialway then
+    use = 25 --footway
   elseif use == nil then
     use = 0 --general road, no special use
   end
@@ -1695,6 +1749,32 @@ function filter_tags_generic(kv)
   kv["average_speed"] = normalize_speed(kv["maxspeed:practical"])
   kv["backward_speed"] = normalize_speed(kv["maxspeed:backward"])
   kv["forward_speed"] = normalize_speed(kv["maxspeed:forward"])
+
+  if piste then
+    kv["max_speed"] = tonumber(default_piste_speed[piste])
+    kv["advisory_speed"] = kv["max_speed"]
+    kv["average_speed"] = kv["max_speed"]
+    kv["forward_speed"] = kv["max_speed"]
+    if piste_backward[piste] == "true" then
+      kv["backward_speed"] = kv["forward_speed"]
+    else
+      kv["backward_speed"] = 0
+    end
+  end
+
+  if aerialway then
+    kv["max_speed"] = tonumber(default_aerialway_speed[aerialway])
+    kv["advisory_speed"] = kv["max_speed"]
+    kv["average_speed"] = kv["max_speed"]
+    kv["forward_speed"] = kv["max_speed"]
+    if aerialway_backward[aerialway] == "true" then
+      kv["backward_speed"] = math.floor(kv["forward_speed"] * 0.3) 
+    else
+      kv["backward_speed"] = 0
+    end
+  end
+
+
   kv["int"] = kv["int"]
   kv["int_ref"] = kv["int_ref"]
   kv["surface"] = kv["surface"]
@@ -1977,6 +2057,14 @@ function nodes_proc (kv, nokeys)
   local motor_vehicle_tag = motor_vehicle_node[kv["motor_vehicle"]]
   local moped_tag = moped_node[kv["moped"]] or moped_node[kv["mofa"]]
   local motorcycle_tag = motor_cycle_node[kv["motorcycle"]]
+
+  -- handle ski related node: aerialway:station
+  if foot_tag == nil then
+    foot_tag = aerialway_node[kv["aerialway"]]
+    if foot_tag then
+      wheelchair_tag = 0
+    end
+  end
 
   if auto_tag == nil then
     auto_tag = motor_vehicle_tag
