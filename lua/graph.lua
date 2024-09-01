@@ -924,6 +924,7 @@ function filter_tags_generic(kv)
   local aerialway = kv["aerialway"]
   if aerialway then
     forward = aerialway[aerialway]
+  end
 
   if forward then
     for k,v in pairs(forward) do
