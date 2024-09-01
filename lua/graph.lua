@@ -35,6 +35,20 @@ highway = {
 ["platform"] =          {["auto_forward"] = "false", ["truck_forward"] = "false", ["bus_forward"] = "false", ["taxi_forward"] = "false", ["moped_forward"] = "false", ["motorcycle_forward"] = "false", ["pedestrian_forward"] = "true",  ["bike_forward"] = "false"}
 }
 
+piste_type = {
+["downhill"] =        {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+["connection"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+}
+
+aerialway = {
+["gondola"] =        {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+["cable_car"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+["chair_lift"] =        {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+["magic_carpet"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+["platter"] =        {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+["drag_lift"] =      {["auto_forward"] = "false",  ["truck_forward"] = "false",  ["bus_forward"] = "false",  ["taxi_forward"] = "false",  ["moped_forward"] = "false", ["motorcycle_forward"] = "false",  ["pedestrian_forward"] = "true", ["bike_forward"] = "false"},
+}
+
 road_class = {
 ["motorway"] = 0,
 ["motorway_link"] = 0,
@@ -901,6 +915,15 @@ function filter_tags_generic(kv)
       kv["emergency_tag"] = "false"
     end
   end
+
+  --figure out ski related ways
+  local piste = kv["piste:type"]
+  if piste then
+    forward = piste_type[piste]
+  end
+  local aerialway = kv["aerialway"]
+  if aerialway then
+    forward = aerialway[aerialway]
 
   if forward then
     for k,v in pairs(forward) do
