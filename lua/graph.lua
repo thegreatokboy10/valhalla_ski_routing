@@ -948,16 +948,6 @@ function filter_tags_generic(kv)
     end
   end
 
-  --figure out ski related ways
-  local piste = kv["piste:type"]
-  if piste then
-    forward = piste_type[piste]
-  end
-  local aerialway = kv["aerialway"]
-  if aerialway then
-    forward = aerialway[aerialway]
-  end
-
   if forward then
     for k,v in pairs(forward) do
       kv[k] = v
@@ -1494,12 +1484,17 @@ function filter_tags_generic(kv)
   end
 
   --check for ski pistes overrides
+  local piste = kv["piste:type"]
+  local aerialway = kv["aerialway"]
+  
   if piste then
+    kv["pedestrian_forward"] = "true"
     kv["pedestrian_backward"] = piste_backward[piste]
   end
 
   --check for ski lifts overrides
   if aerialway then
+    kv["pedestrian_forward"] = "true"
     kv["pedestrian_backward"] = aerialway_backward[aerialway]
   end
 
@@ -2324,22 +2319,39 @@ function nodes_proc (kv, nokeys)
     kv["tagged_access"] = 1
   end
 
+  local file = io.open("node_proc_output.txt", "a")
+
+  -- 检查文件是否成功打开
+  if file then
+      -- 使用dump函数获取表的字符串表示，并添加前缀
+      local dumpResult = "yujie after node process:" .. dump(kv) .. "\n"
+
+      -- 将字符串写入文件
+      file:write(dumpResult)
+
+      -- 关闭文件
+      file:close()
+  else
+      -- 如果文件没有成功打开，打印错误消息
+      print("无法打开文件用于写入")
+  end
+
   return 0, kv
 end
 
 -- useful for dumping the main kv table to see before and after tag filtering
--- function dump(o)
---    if type(o) == 'table' then
---       local s = '{ '
---       for k,v in pairs(o) do
---          if type(k) ~= 'number' then k = '"'..k..'"' end
---          s = s .. '['..k..'] = ' .. dump(v) .. ','
---       end
---       return s .. '} '
---    else
---       return tostring(o)
---    end
--- end
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
 
 function ways_proc (kv, nokeys)
   --if there were no tags passed in, ie keyvalues is empty
@@ -2349,6 +2361,23 @@ function ways_proc (kv, nokeys)
 
   --does it at least have some interesting tags
   filter = filter_tags_generic(kv)
+
+  local file = io.open("way_proc_output.txt", "a")
+
+  -- 检查文件是否成功打开
+  if file then
+      -- 使用dump函数获取表的字符串表示，并添加前缀
+      local dumpResult = "yujie after way process:" .. dump(kv) .. "\n"
+
+      -- 将字符串写入文件
+      file:write(dumpResult)
+
+      -- 关闭文件
+      file:close()
+  else
+      -- 如果文件没有成功打开，打印错误消息
+      print("无法打开文件用于写入")
+  end
 
   --let the caller know if its a keeper or not and give back the modified tags
   --also tell it whether or not its a polygon or road

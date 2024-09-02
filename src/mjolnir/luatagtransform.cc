@@ -4,6 +4,8 @@
 #include "mjolnir/osmdata.h"
 #include <boost/format.hpp>
 #include <stdexcept>
+#include <fstream>
+#include <string>
 
 using namespace valhalla::mjolnir;
 
@@ -78,6 +80,28 @@ Tags LuaTagTransform::Transform(OSMType type, uint64_t osmid, const Tags& maptag
     // tell lua how many items are in the map
     lua_pushinteger(state_, count);
 
+    // write the osmid to file according to the type, if KWay then write to file "way_proc_output.txt" with append mode
+    // if KNode then write to file "node_proc_output.txt" with append mode
+    std::ofstream file;
+    std::string filename;
+    if (type == OSMType::kWay) {
+        filename = "way_proc_output.txt";
+    } else if (type == OSMType::kNode) {
+        filename = "node_proc_output.txt";
+    }
+    // 尝试以追加模式打开文件
+    file.open(filename, std::ios::app);
+
+    // 检查文件是否成功打开
+    if (file.is_open()) {
+        // 文件存在或已创建，现在写入OSMID
+        file << osmid << std::endl; // 写入OSMID并添加换行符
+        file.close(); // 关闭文件
+    } else {
+        // 处理文件打开失败的情况（尽管以追加模式打开时通常不会失败，除非有权限问题）
+        // 这里可以记录错误，但通常不需要担心文件不存在的情况，因为std::ofstream会自动处理
+        LOG_ERROR("Failed to open file for appending."); // 假设的日志记录函数
+    }
     // call lua
     if (lua_pcall(state_, 2, type == OSMType::kWay ? 4 : 2, 0)) {
       const char* lua_error_message = lua_tostring(state_, 1);
