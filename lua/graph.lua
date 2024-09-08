@@ -1486,6 +1486,10 @@ function filter_tags_generic(kv)
   --check for ski pistes overrides
   local piste = kv["piste:type"]
   local aerialway = kv["aerialway"]
+
+  if piste ~= nil and piste ~= "downhill" and piste ~= "connection" then
+    return 1
+  end
   
   if piste then
     kv["pedestrian_forward"] = "true"
