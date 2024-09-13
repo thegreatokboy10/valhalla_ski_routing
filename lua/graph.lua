@@ -1602,8 +1602,10 @@ function filter_tags_generic(kv)
 
   if use == nil and kv["service"] then
     use = 40 
-  elseif piste or aerialway then
-    use = 25 --footway
+  elseif piste then
+    use = 36 --ski piste
+  elseif aerialway then
+    use = 37 --ski aerialway
   elseif use == nil then
     use = 0 --general road, no special use
   end

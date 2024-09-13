@@ -312,6 +312,8 @@ enum class Use : uint8_t {
   kElevator = 33,
   kEscalator = 34,
   kPlatform = 35,
+  kSkiPiste = 36,
+  kSkiAerialway = 37,
 
   // Rest/Service Areas
   kRestArea = 30,
@@ -351,6 +353,8 @@ inline std::string to_string(Use u) {
       {static_cast<uint8_t>(Use::kMountainBike), "mountain_bike"},
       {static_cast<uint8_t>(Use::kSidewalk), "sidewalk"},
       {static_cast<uint8_t>(Use::kFootway), "footway"},
+      {static_cast<uint8_t>(Use::kSkiPiste), "piste"},
+      {static_cast<uint8_t>(Use::kSkiAerialway), "aerialway"},
       {static_cast<uint8_t>(Use::kElevator), "elevator"},
       {static_cast<uint8_t>(Use::kSteps), "steps"},
       {static_cast<uint8_t>(Use::kEscalator), "escalator"},
@@ -759,6 +763,8 @@ inline float GetOffsetForHeading(RoadClass road_class, Use use) {
     case Use::kCycleway:
     case Use::kMountainBike:
     case Use::kFootway:
+    case Use::kSkiPiste:
+    case Use::kSkiAerialway:
     case Use::kSteps:
     case Use::kPath:
     case Use::kPedestrian:

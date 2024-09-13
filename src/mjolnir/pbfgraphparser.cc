@@ -387,6 +387,12 @@ public:
         case Use::kEscalator:
           way_.set_use(Use::kEscalator);
           break;
+        case Use::kSkiPiste:
+          way_.set_use(Use::kSkiPiste);
+          break;
+        case Use::kSkiAerialway:
+          way_.set_use(Use::kSkiAerialway);
+          break;
         case Use::kBridleway:
           way_.set_use(Use::kBridleway);
           break;

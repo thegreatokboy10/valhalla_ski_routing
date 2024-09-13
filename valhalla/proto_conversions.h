@@ -477,6 +477,10 @@ inline TripLeg_Use GetTripLegUse(const baldr::Use use) {
       return TripLeg_Use_kStepsUse;
     case baldr::Use::kEscalator:
       return TripLeg_Use_kEscalatorUse;
+    case baldr::Use::kSkiPiste:
+      return TripLeg_Use_kSkiPisteUse;
+    case baldr::Use::kSkiAerialway:
+      return TripLeg_Use_kSkiAerialwayUse;
     case baldr::Use::kPath:
       return TripLeg_Use_kPathUse;
     case baldr::Use::kPedestrian:

@@ -698,8 +698,8 @@ Cost PedestrianCost::EdgeCost(const baldr::DirectedEdge* edge,
                               const baldr::TimeInfo& time_info,
                               uint8_t& flow_sources) const {
 
-  // Ferries are a special case - they use the ferry speed (stored on the edge)
-  if (edge->use() == Use::kFerry) {
+  // Ferries and ski are a special case - they use the speed stored on the edge
+  if (edge->use() == Use::kFerry || edge->use() == Use::kSkiPiste || edge->use() == Use::kSkiAerialway) {
     auto speed = tile->GetSpeed(edge, flow_mask_, time_info.second_of_week, false, &flow_sources);
     float sec = edge->length() * (kSecPerHour * 0.001f) / static_cast<float>(speed);
     return {sec * ferry_factor_, sec};
