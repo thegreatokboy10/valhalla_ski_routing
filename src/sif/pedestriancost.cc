@@ -600,7 +600,8 @@ PedestrianCost::PedestrianCost(const Costing& costing)
   }
 
   max_distance_ = costing_options.max_distance();
-  speed_ = costing_options.walking_speed();
+  // speed_ = costing_options.walking_speed();
+  speed_ = 4.0f;
   step_penalty_ = costing_options.step_penalty();
   elevator_penalty_ = costing_options.elevator_penalty();
   max_grade_ = costing_options.max_grade();
@@ -699,15 +700,29 @@ Cost PedestrianCost::EdgeCost(const baldr::DirectedEdge* edge,
                               uint8_t& flow_sources) const {
 
   // Ferries and ski are a special case - they use the speed stored on the edge
-  if (edge->use() == Use::kFerry || edge->use() == Use::kSkiPiste || edge->use() == Use::kSkiAerialway) {
+  if (edge->use() == Use::kFerry) {
     auto speed = tile->GetSpeed(edge, flow_mask_, time_info.second_of_week, false, &flow_sources);
     float sec = edge->length() * (kSecPerHour * 0.001f) / static_cast<float>(speed);
     return {sec * ferry_factor_, sec};
   }
 
-  float sec = edge->length() * speedfactor_ *
-              kSacScaleSpeedFactor[static_cast<uint8_t>(edge->sac_scale())] *
-              kGradeBasedSpeedFactor[static_cast<uint8_t>(edge->weighted_grade())];
+  if (edge->use() == Use::kSkiPiste) {
+    auto speed = tile->GetSpeed(edge, flow_mask_, time_info.second_of_week, false, &flow_sources);
+    float sec = edge->length() * (kSecPerHour * 0.001f) / static_cast<float>(speed);
+    return {sec * 1.0f, sec};
+  }
+
+  if (edge->use() == Use::kSkiAerialway) {
+    auto speed = tile->GetSpeed(edge, flow_mask_, time_info.second_of_week, false, &flow_sources);
+    float sec = edge->length() * (kSecPerHour * 0.001f) / static_cast<float>(speed);
+    return {sec * 1.0f, sec};
+  }
+
+
+  // float sec = edge->length() * speedfactor_ *
+  //             kSacScaleSpeedFactor[static_cast<uint8_t>(edge->sac_scale())] *
+  //             kGradeBasedSpeedFactor[static_cast<uint8_t>(edge->weighted_grade())];
+  float sec = edge->length() * (kSecPerHour * 0.001f) / kDefaultSpeedFoot;
 
   if (shortest_) {
     return Cost(edge->length(), sec);
@@ -736,8 +751,10 @@ Cost PedestrianCost::EdgeCost(const baldr::DirectedEdge* edge,
 
   factor *= edge->lit() + (!edge->lit() * unlit_factor_);
 
+  factor = 1.4f;
+
   // Slightly favor walkways/paths and penalize alleys and driveways.
-  return {sec * factor, sec};
+  return {sec * factor + edge->length() / 100 * 300.0f, sec};
 }
 
 // Returns the time (in seconds) to make the transition from the predecessor

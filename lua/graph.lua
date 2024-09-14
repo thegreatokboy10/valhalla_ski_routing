@@ -1557,47 +1557,49 @@ function filter_tags_generic(kv)
   local use = use[kv["service"]]
 
   if kv["highway"] then
-     if kv["highway"] == "construction" then
-        use = 43
-     elseif kv["highway"] == "track" then
-        use = 3
-     elseif kv["highway"] == "living_street" then
-        use = 10
-     elseif use == nil and kv["highway"] == "service" then
-        use = 11
-     elseif kv["highway"] == "cycleway" then
-        use = 20
-     elseif kv["pedestrian_forward"] == "false" and kv["auto_forward"] == "false" and kv["auto_backward"] == "false" and (kv["bike_forward"] == "true" or kv["bike_backward"] == "true") then
-        use = 20
-     elseif (kv["highway"] == "footway" and kv["footway"] == "sidewalk") then
-        use = 24
-     elseif (kv["highway"] == "footway" and kv["footway"] == "crossing") then
-        use = 32
-     elseif kv["highway"] == "footway" then
-        use = 25
-     elseif kv["highway"] == "elevator" then
-        use = 33 --elevator
-     elseif (kv["highway"] == "steps" and kv["conveying"] ~= nil) then
-        use = 34 --escalator
-     elseif kv["highway"] == "steps" then
-        use = 26 --steps/stairs
-     elseif kv["highway"] == "path" then
-        use = 27
-     elseif kv["highway"] == "pedestrian" then
-        use = 28
-     elseif kv["highway"] == "platform" then
-        use = 35
-     elseif kv["pedestrian_forward"] == "true" and
-            kv["auto_forward"] == "false" and kv["auto_backward"] == "false" and
-            kv["truck_forward"] == "false" and kv["truck_backward"] == "false" and
-            kv["bus_forward"] == "false" and kv["bus_backward"] == "false" and
-            kv["bike_forward"] == "false" and kv["bike_backward"] == "false" and
-            kv["moped_forward"] == "false" and kv["moped_backward"] == "false" and
-            kv["motorcycle_forward"] == "false" and kv["motorcycle_backward"] == "false" then
-        use = 28
-     elseif kv["highway"] == "bridleway" then
-        use = 29
-     end
+    return 1 -- we're done with this
+    --  if kv["highway"] == "construction" then
+    --     use = 43
+    --  elseif kv["highway"] == "track" then
+    --     -- use = 3
+    --     return 1 -- toss track
+    --  elseif kv["highway"] == "living_street" then
+    --     use = 10
+    --  elseif use == nil and kv["highway"] == "service" then
+    --     use = 11
+    --  elseif kv["highway"] == "cycleway" then
+    --     use = 20
+    --  elseif kv["pedestrian_forward"] == "false" and kv["auto_forward"] == "false" and kv["auto_backward"] == "false" and (kv["bike_forward"] == "true" or kv["bike_backward"] == "true") then
+    --     use = 20
+    --  elseif (kv["highway"] == "footway" and kv["footway"] == "sidewalk") then
+    --     use = 24
+    --  elseif (kv["highway"] == "footway" and kv["footway"] == "crossing") then
+    --     use = 32
+    --  elseif kv["highway"] == "footway" then
+    --     use = 25
+    --  elseif kv["highway"] == "elevator" then
+    --     use = 33 --elevator
+    --  elseif (kv["highway"] == "steps" and kv["conveying"] ~= nil) then
+    --     use = 34 --escalator
+    --  elseif kv["highway"] == "steps" then
+    --     use = 26 --steps/stairs
+    --  elseif kv["highway"] == "path" then
+    --     use = 27
+    --  elseif kv["highway"] == "pedestrian" then
+    --     use = 28
+    --  elseif kv["highway"] == "platform" then
+    --     use = 35
+    --  elseif kv["pedestrian_forward"] == "true" and
+    --         kv["auto_forward"] == "false" and kv["auto_backward"] == "false" and
+    --         kv["truck_forward"] == "false" and kv["truck_backward"] == "false" and
+    --         kv["bus_forward"] == "false" and kv["bus_backward"] == "false" and
+    --         kv["bike_forward"] == "false" and kv["bike_backward"] == "false" and
+    --         kv["moped_forward"] == "false" and kv["moped_backward"] == "false" and
+    --         kv["motorcycle_forward"] == "false" and kv["motorcycle_backward"] == "false" then
+    --     use = 28
+    --  elseif kv["highway"] == "bridleway" then
+    --     use = 29
+    --  end
   end
 
   if use == nil and kv["service"] then
